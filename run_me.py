@@ -5,7 +5,7 @@ from iexfinance.stocks import get_historical_data
 from iexfinance.stocks import get_historical_intraday
 
 IEX_TOKEN = 'pk_e26954db0aca40eabd7947fe39d03281'
-a = Stock("AAPL", token="pk_e26954db0aca40eabd7947fe39d03281")
+a = Stock("AAPL", token=IEX_TOKEN)
 a.get_quote()
 print(a.get_company_name())
 print(a.get_historical_prices())
