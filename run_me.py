@@ -6,6 +6,9 @@ from iexfinance.stocks import Stock
 from datetime import datetime
 import my_private_token
 import requests
+import yaml
+import json
+import os
 import pandas
 import csv
 import pyEX as p
@@ -14,6 +17,13 @@ import pyEX as p
 # Do not embed API keys directly in code - security
 IEX_TOKEN = my_private_token.LOCAL_IEX_TOKEN
 base = 'https://cloud.iexapis.com/'
+
+
+def turn_file_to_object(file_name):
+    with open(file_name, 'r') as file:
+        data = file.read().replace('\n', '')
+    all_symbols_object = yaml.load(data, Loader=yaml.FullLoader)
+    return all_symbols_object
 
 
 def activate_single_stock(ticker):
@@ -46,17 +56,19 @@ def main():
     # print('For value investment - click 3')
     # choice = input('')
 
-    activate_single_stock('DAL')
+    # activate_single_stock('TEVA')
     # start = datetime(2019, 1, 1)
     # end = datetime(2019, 10, 10)
     # # # User pandas_reader.data.DataReader to load the desired data. As simple as that.
     # panel_data = data.DataReader('DAL', 'iex', start, end, api_key=IEX_TOKEN)
     # print(panel_data)
-    # r = requests.get('https://cloud.iexapis.com/stable/stock/aapl/quote?token=' + IEX_TOKEN + '&format=csv')
-    # lines = (line.decode('utf-8') for line in r.iter_lines())
-    # for row in csv.reader(lines):
-    #     print(row)
+    # symbols = requests.get('https://cloud.iexapis.com/beta/ref-data/symbols?token=pk_e26954db0aca40eabd7947fe39d03281')
+    # data = symbols.json()
+    # print(symbols)
 
+    all_symbols_object = turn_file_to_object('all_symbols')
+    print(type(all_symbols_object))
+    print(type(all_symbols_object[1]))
 
 
 if __name__ == '__main__':
