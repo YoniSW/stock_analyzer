@@ -65,6 +65,7 @@ def main():
     # symbols = requests.get('https://cloud.iexapis.com/beta/ref-data/symbols?token=pk_e26954db0aca40eabd7947fe39d03281')
     # data = symbols.json()
     # print(symbols)
+    # Check
 
     all_symbols_object = turn_file_to_object('all_symbols')
     print(type(all_symbols_object))
