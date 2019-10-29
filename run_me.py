@@ -4,6 +4,7 @@ from iexfinance.stocks import get_historical_intraday
 from iexfinance.altdata import get_social_sentiment
 from iexfinance.stocks import Stock
 from datetime import datetime
+import matplotlib.pyplot as plt
 import my_private_token
 import requests
 import yaml
@@ -56,21 +57,34 @@ def main():
     # print('For value investment - click 3')
     # choice = input('')
 
+    #####  send single stock to function
     # activate_single_stock('TEVA')
-    # start = datetime(2019, 1, 1)
-    # end = datetime(2019, 10, 10)
-    # # # User pandas_reader.data.DataReader to load the desired data. As simple as that.
-    # panel_data = data.DataReader('DAL', 'iex', start, end, api_key=IEX_TOKEN)
-    # print(panel_data)
-    # symbols = requests.get('https://cloud.iexapis.com/beta/ref-data/symbols?token=pk_e26954db0aca40eabd7947fe39d03281')
-    # data = symbols.json()
-    # print(symbols)
-    # Check
 
     all_symbols_object = turn_file_to_object('all_symbols')
     print(type(all_symbols_object))
     print(type(all_symbols_object[1]))
 
+    for ticker in all_symbols_object:
+        print(ticker['symbol'])
+
+    print('\nNumber of tickers: ' + str(len(all_symbols_object)))
+
+    # plt.plot([1, 2, 3, 4, 5, 8])
+    # plt.ylabel('some numbers')
+    # plt.show()
+
+
+    #####  optional functions
+
+    # start = datetime(2019, 1, 1)
+    # end = datetime(2019, 10, 10)
+    # # # User pandas_reader.data.DataReader to load the desired data. As simple as that.
+    # panel_data = data.DataReader('DAL', 'iex', start, end, api_key=IEX_TOKEN)
+    # print(panel_data)
+    # # symbols = requests.get(base + 'beta/ref-data/symbols?token=pk_e26954db0aca40eabd7947fe39d03281')
+    # # data = symbols.json()
+    # # print(symbols)
+    # # Check
 
 if __name__ == '__main__':
     start_time = datetime.now()
