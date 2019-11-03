@@ -14,26 +14,29 @@ import pandas as pd
 import csv
 import pyEX as p
 
+# Do not embed API keys directly in code - security
+IEX_TOKEN = my_private_token.LOCAL_IEX_TOKEN
+base = 'https://cloud.iexapis.com/'
+
 
 # Make function for calls to Yahoo Finance
 def get_adj_close(ticker, start, end):
-    '''
+    """
     A function that takes ticker symbols, starting period, ending period
     as arguments and returns with a Pandas DataFrame of the Adjusted Close Prices
     for the tickers from Yahoo Finance
-    '''
+    """
     start = start
     end = end
     info = web.DataReader(ticker, data_source='yahoo', start=start, end=end)['Adj Close']
     return pd.DataFrame(info)
 
 
-# Do not embed API keys directly in code - security
-IEX_TOKEN = my_private_token.LOCAL_IEX_TOKEN
-base = 'https://cloud.iexapis.com/'
-
-
 def turn_file_to_object(file_name):
+    """
+    This function will take a text file with all symbols basic data
+    and convert it into a python dictionary data structure via yaml library
+    """
     with open(file_name, 'r') as file:
         data = file.read().replace('\n', '')
     all_symbols_object = yaml.load(data, Loader=yaml.FullLoader)
@@ -42,25 +45,26 @@ def turn_file_to_object(file_name):
 
 def stock_info(ticker):
     a = Stock(ticker, token=IEX_TOKEN)
-    # print("#### Stock Official name ####")
-    # print(a.get_company_name())
-    #
-    # print("\n#### Stock Main Data ####")
-    # main_data = a.get_quote()
-    # print(main_data)
-    # print(main_data['iexRealtimePrice'])
-    #
-    # print("\n#### Stock shares outstanding ####")
-    # print(a.get_shares_outstanding())
-    #
-    # print("\n#### Stock historical prices ####")
-    # print(a.get_historical_prices())
-    #
-    # print('\n')
-    # stat = a.get_key_stats()
-    # print(stat)
-    # if 'peRatio' in stat:
-    #     print(stat['peRatio'])
+    print("#### get_company_name() ####")
+    print(a.get_company_name())
+
+    print("\n#### get_quote() ####")
+    main_data = a.get_quote()
+    print(main_data)
+    print(main_data['iexRealtimePrice'])
+
+    print("\n#### get_shares_outstanding() ####")
+    print(a.get_shares_outstanding())
+
+    print("\n#### get_historical_prices() ####")
+    print(a.get_historical_prices())
+
+    print('\n')
+    stat = a.get_key_stats()
+    print(stat)
+    if 'peRatio' in stat:
+        print("\n#### get_key_stats()['peRatio'] ####")
+        print(stat['peRatio'])
     return a
 
 
@@ -93,17 +97,37 @@ def scan_symbols(n):
         n -= 1
 
 
+def get_recommended_stocks(n):
+    recommended_symbols = []
+    tmp = scan_symbols(300)
+    if n == 1:
+        # check condition for swing investors
+        for stock in tmp:
+            tick = stock[0]
+            print(tick)
+            if tick.get_company_name()['latestVolume'] > tick.get_key_stats()['avg30Volume']:
+                print(stock)
+    # if n == 2:
+        # check condition for value investors
+
+    return recommended_symbols
+
+
 def main():
     # print('which value investor are you?')
-    # print('For daily investment - click 1')
-    # print('For swing investment - click 2')
-    # print('For value investment - click 3')
+    # print('For swing investment - click 1')
+    # print('For value investment - click 2')
     # choice = input('')
+    #
+    # recommended_stocks = get_recommended_stocks(choice)
+    # print(recommended_stocks)
+    # for s in recommended_stocks:
+    #     show_bollinger(s)
 
 
     # stock_info('fb')
-    show_bollinger('fb')
-    # print(scan_symbols(10))
+
+    show_bollinger('teva')
 
 
 if __name__ == '__main__':
