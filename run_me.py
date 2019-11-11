@@ -7,7 +7,6 @@ from datetime import datetime
 import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 import my_private_token
-import requests
 import yaml
 import os
 import pandas as pd
@@ -44,6 +43,10 @@ def turn_file_to_object(file_name):
 
 
 def stock_info(ticker):
+    """
+    This function will receive a ticker and print
+    data structure with all main relevant data we will use
+    """
     a = Stock(ticker, token=IEX_TOKEN)
     print("#### get_company_name() ####")
     print(a.get_company_name())
@@ -69,6 +72,10 @@ def stock_info(ticker):
 
 
 def show_bollinger(ticker):
+    """
+    This function will calculate bolilnger band
+    and display it in a graph
+    """
     # Get Adjusted Closing Prices for Facebook, Tesla and Amazon between 2016-2017
     this_ticker = get_adj_close(str(ticker), '1/2/2016', '31/12/2017')
     this_ticker_info = stock_info(ticker)
@@ -97,18 +104,37 @@ def scan_symbols(n):
         n -= 1
 
 
-def get_recommended_stocks(n):
-    recommended_symbols = []
-    tmp = scan_symbols(300)
-    if n == 1:
-        # check condition for swing investors
-        for stock in tmp:
-            tick = stock[0]
-            print(tick)
-            if tick.get_company_name()['latestVolume'] > tick.get_key_stats()['avg30Volume']:
-                print(stock)
-    # if n == 2:
-        # check condition for value investors
+def get_sorted_swing_stocks(amount):
+    """
+    -Trade Avg. Volume VS current Volume
+    -50 day Bollinger Band
+    -52 Week price Range
+    -Weekly price range
+    -Daily price Range
+    -Avoid ‘penny’ stocks
+    """
+    random_stocks = scan_symbols(amount)
+    for stock in random_stocks:
+        tick = stock[0]
+        print(tick)
+        if tick.get_company_name()['latestVolume'] > tick.get_key_stats()['avg30Volume']:
+            print(stock)
+
+
+def get_sorted_value_stocks(amount):
+    """
+     -Low p/e ratio according to sector
+     -Profitable stocks
+     -Avoid ‘penny’ stocks
+     """
+    random_stocks = scan_symbols(amount)
+
+
+def get_recommended_stocks(choice, num):
+    if choice == 1:
+        recommended_symbols = get_sorted_swing_stocks(num)
+    if choice == 2:
+        recommended_symbols = get_sorted_value_stocks(num)
 
     return recommended_symbols
 
@@ -118,8 +144,9 @@ def main():
     # print('For swing investment - click 1')
     # print('For value investment - click 2')
     # choice = input('')
-    #
-    # recommended_stocks = get_recommended_stocks(choice)
+    # print('How many stocks to show?')
+    # num_of_stocks = input('')
+    # recommended_stocks = get_recommended_stocks(choice, num_of_stocks)
     # print(recommended_stocks)
     # for s in recommended_stocks:
     #     show_bollinger(s)
