@@ -16,7 +16,7 @@ base = 'https://cloud.iexapis.com/'
 def write_console(str):
     for ch in str:
         sys.stdout.write(ch)
-        time.sleep(0.09)
+        time.sleep(0.055)
     print('')
 
 # Make function for calls to Yahoo Finance
@@ -188,10 +188,10 @@ def get_sorted_value_stocks(amount):
             if i == amount:
                 return recommended_stocks
         except KeyError as e:
-            print('requirements for ' + tick[0] + ' stock is missing')
             continue
         except TypeError as e:
-            print('requirements for ' + tick[0] + ' stock is missing')
+            continue
+        except iexfinance.utils as e:
             continue
 
 

@@ -14,6 +14,7 @@ def main():
     write_console('\nWhich value investor are you?')
     write_console('For swing investment - click 1')
     write_console('For value investment - click 2')
+    print('')
     choice = input('')
     write_console('How many recommended stocks do want to receive?')
     num_of_stocks = input('')
@@ -28,7 +29,6 @@ def main():
     for s in recommended_stocks:
         show_bollinger(s[0])
         time.sleep(1)
-
 
 
 if __name__ == '__main__':
