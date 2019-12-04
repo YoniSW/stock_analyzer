@@ -2,13 +2,22 @@ from iexfinance.stocks import Stock
 import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 import my_private_token
-import yaml
 import pandas as pd
+import random
+import yaml
+import time
+import sys
 
 
 IEX_TOKEN = my_private_token.LOCAL_IEX_TOKEN
 base = 'https://cloud.iexapis.com/'
 
+
+def write_console(str):
+    for ch in str:
+        sys.stdout.write(ch)
+        time.sleep(0.1)
+    print('')
 
 # Make function for calls to Yahoo Finance
 def get_adj_close(ticker, start, end):
@@ -70,8 +79,11 @@ def show_bollinger(ticker):
     and display it in a graph
     """
     # Get Adjusted Closing Prices for Facebook, Tesla and Amazon between 2016-2017
-    this_ticker = get_adj_close(str(ticker), '1/2/2016', '31/12/2017')
-    this_ticker_info = stock_info(ticker)
+    try:
+        this_ticker = get_adj_close(str(ticker), '1/2/2018', '3/12/2018')
+        this_ticker_info = Stock(ticker, token=IEX_TOKEN)
+    except:
+        return
 
     # Calculate 30 Day Moving Average, Std Deviation, Upper Band and Lower Band
     this_ticker['30 Day MA'] = this_ticker['Adj Close'].rolling(window=20).mean()
@@ -89,8 +101,10 @@ def show_bollinger(ticker):
 def scan_symbols(n):
     chosen_symbols = []
     all_symbols_object = turn_file_to_object('all_symbols')
+    random.shuffle(all_symbols_object)
     for ticker in all_symbols_object:
         if n == 0:
+            random.shuffle(chosen_symbols)
             return chosen_symbols
         # return list of tuples that contain (symbol, company name)
         chosen_symbols.append((ticker['symbol'], ticker['name']))
@@ -100,7 +114,7 @@ def scan_symbols(n):
 def get_sorted_swing_stocks(amount):
     i = 0
     recommended_stocks = []
-    random_stocks = scan_symbols(100)
+    random_stocks = scan_symbols(300)
     for tick in random_stocks:
         a = Stock(tick[0], token=IEX_TOKEN)
         stat = a.get_key_stats()
@@ -108,34 +122,77 @@ def get_sorted_swing_stocks(amount):
         add_to_list = 0
         last_price = quote['latestPrice']
         # Avoid penny stocks
-        if last_price < 5:
+        try:
+            if len(recommended_stocks) == amount:
+                break
+            if last_price < 5:
+                continue
+            # Avoid current price > week52High
+            if last_price < float(quote['week52High']) - (float(last_price/10)):
+                add_to_list = add_to_list + 1
+            # Avoid current price < week52Low
+            if last_price > quote['week52Low'] - (last_price / 10):
+                add_to_list = add_to_list + 1
+            # Trade Avg. Volume VS current Volume
+            if quote['previousVolume'] > stat['avg30Volume']:
+                add_to_list = add_to_list + 1
+            # 50 day Bollinger Band
+            if last_price < stat['day50MovingAvg']:
+                add_to_list = add_to_list + 1
+            if add_to_list == 4:
+                recommended_stocks.append(tick)
+                print('Added ' + str(tick[0]) + ' to recommended stocks')
+                i = i + 1
+            if i == amount:
+                return recommended_stocks
+        except KeyError as e:
             continue
-        # Avoid current price > week52High
-        if last_price < quote['week52High'] - (last_price/10):
-            add_to_list = add_to_list + 1
-        # Avoid current price < week52Low
-        if last_price > quote['week52Low'] - (last_price / 10):
-            add_to_list = add_to_list + 1
-        # Trade Avg. Volume VS current Volume
-        if quote['latestVolume'] > stat['avg30Volume']:
-            add_to_list = add_to_list + 1
-        # 50 day Bollinger Band
-        if last_price < quote['day50MovingAvg']:
-            add_to_list = add_to_list + 1
-        if add_to_list == 4:
-            recommended_stocks.append(tick)
-            i = i + 1
-        if i == amount:
-            return recommended_stocks
+        except TypeError as e:
+            continue
+        except iexfinance.utils as e:
+            continue
 
 
 def get_sorted_value_stocks(amount):
-    """
-     -Low p/e ratio according to sector
-     -Profitable stocks
-     -Avoid ‘penny’ stocks
-     """
-    random_stocks = scan_symbols(amount)
+    i = 0
+    recommended_stocks = []
+    random_stocks = scan_symbols(300)
+    for tick in random_stocks:
+        a = Stock(tick[0], token=IEX_TOKEN)
+        stat = a.get_key_stats()
+        quote = a.get_quote()
+        add_to_list = 0
+        last_price = quote['latestPrice']
+        # Avoid penny stocks
+        try:
+            if len(recommended_stocks) == amount:
+                break
+            if last_price < 5:
+                continue
+            # Avoid current price > week52High
+            if last_price < float(quote['week52High']) - (float(last_price / 10)):
+                add_to_list = add_to_list + 1
+            # Avoid current price < week52Low
+            if last_price > quote['week52Low'] - (last_price / 10):
+                add_to_list = add_to_list + 1
+            # Trade Avg. Volume VS current Volume
+            if quote['previousVolume'] > stat['avg30Volume']:
+                add_to_list = add_to_list + 1
+            # low P/E ratio
+            if stat['peRatio'] < 15:
+                add_to_list = add_to_list + 1
+            if add_to_list == 4:
+                recommended_stocks.append(tick)
+                print('Added ' + str(tick[0]) + ' to recommended stocks')
+                i = i + 1
+            if i == amount:
+                return recommended_stocks
+        except KeyError as e:
+            print('requirements for ' + tick[0] + ' stock is missing')
+            continue
+        except TypeError as e:
+            print('requirements for ' + tick[0] + ' stock is missing')
+            continue
 
 
 def get_recommended_stocks(choice, num):
