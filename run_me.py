@@ -34,7 +34,7 @@ def main():
     choice = 1
     num_of_stocks = 5
     #################
-
+    #
     recommended_stocks = get_recommended_stocks(choice, num_of_stocks)
     print(recommended_stocks)
 

@@ -56,6 +56,7 @@ def stock_info(ticker):
 
     print('\n')
     stat = a.get_key_stats()
+    print("\n#### get_key_stats()####")
     print(stat)
     if 'peRatio' in stat:
         print("\n#### get_key_stats()['peRatio'] ####")
@@ -101,22 +102,25 @@ def get_sorted_swing_stocks(amount):
     recommended_stocks = []
     random_stocks = scan_symbols(100)
     for tick in random_stocks:
+        a = Stock(tick[0], token=IEX_TOKEN)
+        stat = a.get_key_stats()
+        quote = a.get_quote()
         add_to_list = 0
-        last_price = tick[0].get_quote()['latestPrice']
+        last_price = quote['latestPrice']
         # Avoid penny stocks
         if last_price < 5:
             continue
         # Avoid current price > week52High
-        if last_price < tick[0].get_quote()['week52High'] - (last_price/10):
+        if last_price < quote['week52High'] - (last_price/10):
             add_to_list = add_to_list + 1
         # Avoid current price < week52Low
-        if last_price > tick[0].get_quote()['week52Low'] - (last_price / 10):
+        if last_price > quote['week52Low'] - (last_price / 10):
             add_to_list = add_to_list + 1
         # Trade Avg. Volume VS current Volume
-        if tick[0].get_quote()['latestVolume'] > tick[0].get_quote()['avg30Volume']:
+        if quote['latestVolume'] > stat['avg30Volume']:
             add_to_list = add_to_list + 1
         # 50 day Bollinger Band
-        if last_price < tick[0].get_quote()['day50MovingAvg']:
+        if last_price < quote['day50MovingAvg']:
             add_to_list = add_to_list + 1
         if add_to_list == 4:
             recommended_stocks.append(tick)
