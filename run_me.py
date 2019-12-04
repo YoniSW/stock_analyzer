@@ -28,14 +28,21 @@ def main():
     # choice = input('')
     # print('How many recommended stocks do want to receive?')
     # num_of_stocks = input('')
-    # recommended_stocks = get_recommended_stocks(choice, num_of_stocks)
-    # print(recommended_stocks)
+
+    # DEBUG vars
+    #################
+    choice = 1
+    num_of_stocks = 5
+    #################
+
+    recommended_stocks = get_recommended_stocks(choice, num_of_stocks)
+    print(recommended_stocks)
+
     # for s in recommended_stocks:
     #     show_bollinger(s)
 
     # stock_info('fb')
-
-    show_bollinger('teva')
+    # show_bollinger('teva')
 
 
 if __name__ == '__main__':

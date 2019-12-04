@@ -9,6 +9,7 @@ import pandas as pd
 IEX_TOKEN = my_private_token.LOCAL_IEX_TOKEN
 base = 'https://cloud.iexapis.com/'
 
+
 # Make function for calls to Yahoo Finance
 def get_adj_close(ticker, start, end):
     """
@@ -96,20 +97,32 @@ def scan_symbols(n):
 
 
 def get_sorted_swing_stocks(amount):
-    """
-    -Trade Avg. Volume VS current Volume
-    -50 day Bollinger Band
-    -52 Week price Range
-    -Weekly price range
-    -Daily price Range
-    -Avoid ‘penny’ stocks
-    """
-    random_stocks = scan_symbols(amount)
-    for stock in random_stocks:
-        tick = stock[0]
-        print(tick)
-        if tick.get_company_name()['latestVolume'] > tick.get_key_stats()['avg30Volume']:
-            print(stock)
+    i = 0
+    recommended_stocks = []
+    random_stocks = scan_symbols(100)
+    for tick in random_stocks:
+        add_to_list = 0
+        last_price = tick[0].get_quote()['latestPrice']
+        # Avoid penny stocks
+        if last_price < 5:
+            continue
+        # Avoid current price > week52High
+        if last_price < tick[0].get_quote()['week52High'] - (last_price/10):
+            add_to_list = add_to_list + 1
+        # Avoid current price < week52Low
+        if last_price > tick[0].get_quote()['week52Low'] - (last_price / 10):
+            add_to_list = add_to_list + 1
+        # Trade Avg. Volume VS current Volume
+        if tick[0].get_quote()['latestVolume'] > tick[0].get_quote()['avg30Volume']:
+            add_to_list = add_to_list + 1
+        # 50 day Bollinger Band
+        if last_price < tick[0].get_quote()['day50MovingAvg']:
+            add_to_list = add_to_list + 1
+        if add_to_list == 4:
+            recommended_stocks.append(tick)
+            i = i + 1
+        if i == amount:
+            return recommended_stocks
 
 
 def get_sorted_value_stocks(amount):
