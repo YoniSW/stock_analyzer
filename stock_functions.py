@@ -16,7 +16,7 @@ base = 'https://cloud.iexapis.com/'
 def write_console(str):
     for ch in str:
         sys.stdout.write(ch)
-        time.sleep(0.1)
+        time.sleep(0.09)
     print('')
 
 # Make function for calls to Yahoo Finance

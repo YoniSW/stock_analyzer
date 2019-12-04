@@ -19,13 +19,16 @@ def main():
     num_of_stocks = input('')
     write_console('\nScanning all USA Stock Market, It may take a while...')
     recommended_stocks = get_recommended_stocks(int(choice), int(num_of_stocks))
-    print(recommended_stocks)
-
+    write_console('\n\nDone scanning your stocks!\n')
+    print(''.ljust(75, '='))
+    for s in recommended_stocks:
+        print('|' + str(s[0]).ljust(10) + '|' + str(s[1]).ljust(62) + '|')
+    print(''.ljust(75, '='))
+    write_console('\n\nSystem will show bollinger bands forthose stocks\n')
     for s in recommended_stocks:
         show_bollinger(s[0])
         time.sleep(1)
-    # stock_info('fb')
-    # show_bollinger('teva')
+
 
 
 if __name__ == '__main__':
