@@ -25,6 +25,7 @@ def main():
     for s in recommended_stocks:
         print('|' + str(s[0]).ljust(10) + '|' + str(s[1]).ljust(62) + '|')
     print(''.ljust(75, '='))
+    
     write_console('\n\nSystem will show bollinger bands forthose stocks\n')
     for s in recommended_stocks:
         show_bollinger(s[0])
